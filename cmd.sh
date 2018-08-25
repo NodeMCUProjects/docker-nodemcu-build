@@ -8,7 +8,7 @@ set -e
 # - FLOAT_ONLY=1, if you want the floating point firmware
 
 export BUILD_DATE COMMIT_ID BRANCH SSL MODULES
-BUILD_DATE="$(date "+%Y-%m-%d %H:%M")"
+BUILD_DATE="$(date +%Y%m%d-%H%M%S)"
 COMMIT_ID="$(git rev-parse HEAD)"
 BRANCH="$(git rev-parse --abbrev-ref HEAD | sed -r 's/[\/\\]+/_/g')"
 
@@ -63,22 +63,22 @@ if [ "$CAN_MODIFY_VERSION" = true ]; then
 fi
 
 # make a float build if !only-integer
-if [ -z "$INTEGER_ONLY" ]; then
-  make WRAPCC="$(which ccache)" clean all
-  cd bin
-  srec_cat -output nodemcu_float_"${IMAGE_NAME}".bin -binary 0x00000.bin -binary -fill 0xff 0x00000 0x10000 0x10000.bin -binary -offset 0x10000
-  # copy and rename the mapfile to bin/
-  cp ../app/mapfile nodemcu_float_"${IMAGE_NAME}".map
-  cd ../
-else
-  true
-fi
+#if [ -z "$INTEGER_ONLY" ]; then
+#  make WRAPCC="$(which ccache)" clean all -j8
+#  cd bin
+#  srec_cat -output nodemcu_float_"${IMAGE_NAME}".bin -binary rboot.bin -binary -fill 0xff 0x0 0x1000 /opt/rboot_cfg.bin -binary -fill 0xff 0x0 0x1000 -offset 0x1000 eagle.app.v6.bin -binary -fill 0xff 0x0 0x10000 -offset 0x2000 eagle.app.v6.bin -binary -fill 0xff 0x0 0xfe000 -offset 0x102000 0x200000-4MB.img -binary -fill 0xff 0x0 0x1fc000 -offset 0x200000 ../sdk/esp_iot_sdk_v2.2.1/bin/esp_init_data_default_v05.bin -binary -fill 0xff 0x0 0x4000 -offset 0x3fc000
+#  # copy and rename the mapfile to bin/
+#  cp ../app/mapfile nodemcu_float_"${IMAGE_NAME}".map
+#  cd ../
+#else
+#  true
+#fi
 
 # make an integer build
 if [ -z "$FLOAT_ONLY" ]; then
-  make WRAPCC="$(which ccache)" EXTRA_CCFLAGS="-DLUA_NUMBER_INTEGRAL" clean all
+  make WRAPCC="$(which ccache)" clean all -j8
   cd bin
-  srec_cat -output nodemcu_integer_"${IMAGE_NAME}".bin -binary 0x00000.bin -binary -fill 0xff 0x00000 0x10000 0x10000.bin -binary -offset 0x10000
+  srec_cat -output nodemcu_integer_"${IMAGE_NAME}".bin -binary rboot.bin -binary -fill 0xff 0x0 0x1000 /opt/rboot_cfg.bin -binary -fill 0xff 0x0 0x1000 -offset 0x1000 eagle.app.v6.bin -binary -fill 0xff 0x0 0x10000 -offset 0x2000 eagle.app.v6.bin -binary -fill 0xff 0x0 0xfe000 -offset 0x102000 0x200000-4MB.img -binary -fill 0xff 0x0 0x1fc000 -offset 0x200000 ../sdk/esp_iot_sdk_v2.2.1/bin/esp_init_data_default_v05.bin -binary -fill 0xff 0x0 0x4000 -offset 0x3fc000
   # copy and rename the mapfile to bin/
   cp ../app/mapfile nodemcu_integer_"${IMAGE_NAME}".map
   cd ../

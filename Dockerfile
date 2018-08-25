@@ -10,7 +10,7 @@ MAINTAINER marcelstoer
 # - cd <nodemcu-firmware>
 # - docker run --rm -ti -v `pwd`:/opt/nodemcu-firmware docker-nodemcu-build
 
-RUN apt-get update && apt-get install -y wget unzip git make python-serial srecord bc xz-utils gcc ccache tzdata
+RUN apt-get update && apt-get install -y wget unzip git make python-serial srecord bc xz-utils gcc ccache tzdata gawk
 # Release some space...
 RUN rm -rf /var/lib/apt/lists/*
 RUN mkdir /opt/nodemcu-firmware
@@ -20,5 +20,6 @@ RUN rm -rf /root
 RUN ln -s /tmp /root
 
 COPY cmd.sh /opt/
+COPY rboot_cfg.bin /opt/
 
 CMD /opt/cmd.sh
